@@ -37,6 +37,10 @@ class image_classifier():
         self.capture_timer.setInterval(200)  # 0.2 seconds
         self.capture_timer.timeout.connect(self.take_shot)
 
+        self.detection_result_timer = QTimer(self.my_parent)
+        self.detection_result_timer.setInterval(200)
+        self.detection_result_timer.timeout.connect(self.handle_inference_results)
+
         self.ui = parentui
         self.ui.pushButtonTakeShots.pressed.connect(self.start_taking_shots)
         self.ui.pushButtonTakeShots.released.connect(self.stop_taking_shots)
@@ -53,16 +57,26 @@ class image_classifier():
         self.ui.pushButtonToggleInference.clicked.connect(self.toggle_inference)
 
 
+    def handle_inference_results(self):
+        results = self.my_annotator.current_results
+        if results:
+            self.ui.plainTextEditInferenceResults.clear()
+            txt = f"Names:{results[0].names}\n"
+            top1_ndx = results[0].probs.top1
+            txt += f"Top1:{results[0].names[top1_ndx]} (conf:{results[0].probs.top1conf.tolist()*100:.1f} %)\n"
+            self.ui.plainTextEditInferenceResults.appendPlainText(txt)
+
     def toggle_inference(self):
         if self.my_video and self.my_video.is_detecting:
             self.my_video.is_detecting = False
+            self.detection_result_timer.stop()
         elif self.my_video and not self.my_video.is_detecting:
             sel_model = self.ui.comboBoxTrainedModels.currentText()
             if sel_model:
                 model_path = f"{self.project_data.get('directory')}/trained_models/{sel_model}/weights/best.pt"
                 self.my_video.set_model(model_path)
                 self.my_video.is_detecting = True
-
+                self.detection_result_timer.start()
 
     def update_trained_models(self):
         trained_model_list = self.get_subfolders_scandir(f"{self.project_data.get('directory')}/trained_models")
