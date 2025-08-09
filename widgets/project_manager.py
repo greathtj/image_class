@@ -14,6 +14,7 @@ from widgets.annotation_manager import AnnotationWidget
 from widgets.video_stream_manager import VideoStreamer
 
 from image_classifer import image_classifier
+from object_detector import object_detector
 
 
 class projectManagerWidget(QWidget):
@@ -81,6 +82,13 @@ class projectManagerWidget(QWidget):
     def set_proejct_screen(self, project_type):
         if project_type == "Object Detection":
             self.ui.stackedWidgetProject.setCurrentIndex(1)
+            self.object_detector = object_detector(
+                parentui=self.ui,
+                projec_data=self.project_data, 
+                my_annotator=self.my_annotator,
+                my_video=self.my_video,
+                parent=self
+            )
         elif project_type == "Image Classification":
             self.ui.stackedWidgetProject.setCurrentIndex(2)
             self.image_classifier = image_classifier(

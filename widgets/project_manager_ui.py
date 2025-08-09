@@ -84,6 +84,67 @@ class Ui_FormProjectManager(object):
 
         self.verticalLayout_2.addWidget(self.label_2)
 
+        self.tabWidgetOD = QTabWidget(self.page_OD)
+        self.tabWidgetOD.setObjectName(u"tabWidgetOD")
+        self.tabDataset = QWidget()
+        self.tabDataset.setObjectName(u"tabDataset")
+        self.verticalLayout_6 = QVBoxLayout(self.tabDataset)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.horizontalLayout_10 = QHBoxLayout()
+        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
+        self.label_15 = QLabel(self.tabDataset)
+        self.label_15.setObjectName(u"label_15")
+        sizePolicy.setHeightForWidth(self.label_15.sizePolicy().hasHeightForWidth())
+        self.label_15.setSizePolicy(sizePolicy)
+        self.label_15.setMinimumSize(QSize(0, 0))
+        self.label_15.setMaximumSize(QSize(16777215, 16777215))
+
+        self.horizontalLayout_10.addWidget(self.label_15)
+
+        self.pushButtonTakeShotsOD = QPushButton(self.tabDataset)
+        self.pushButtonTakeShotsOD.setObjectName(u"pushButtonTakeShotsOD")
+
+        self.horizontalLayout_10.addWidget(self.pushButtonTakeShotsOD)
+
+        self.pushButtonImpotrOD = QPushButton(self.tabDataset)
+        self.pushButtonImpotrOD.setObjectName(u"pushButtonImpotrOD")
+
+        self.horizontalLayout_10.addWidget(self.pushButtonImpotrOD)
+
+        self.pushButtonAnnotateOD = QPushButton(self.tabDataset)
+        self.pushButtonAnnotateOD.setObjectName(u"pushButtonAnnotateOD")
+
+        self.horizontalLayout_10.addWidget(self.pushButtonAnnotateOD)
+
+        self.pushButtonMakeDatasetOD = QPushButton(self.tabDataset)
+        self.pushButtonMakeDatasetOD.setObjectName(u"pushButtonMakeDatasetOD")
+
+        self.horizontalLayout_10.addWidget(self.pushButtonMakeDatasetOD)
+
+
+        self.verticalLayout_6.addLayout(self.horizontalLayout_10)
+
+        self.tableWidgetFilesOD = QTableWidget(self.tabDataset)
+        if (self.tableWidgetFilesOD.columnCount() < 3):
+            self.tableWidgetFilesOD.setColumnCount(3)
+        __qtablewidgetitem = QTableWidgetItem()
+        self.tableWidgetFilesOD.setHorizontalHeaderItem(0, __qtablewidgetitem)
+        __qtablewidgetitem1 = QTableWidgetItem()
+        self.tableWidgetFilesOD.setHorizontalHeaderItem(1, __qtablewidgetitem1)
+        __qtablewidgetitem2 = QTableWidgetItem()
+        self.tableWidgetFilesOD.setHorizontalHeaderItem(2, __qtablewidgetitem2)
+        self.tableWidgetFilesOD.setObjectName(u"tableWidgetFilesOD")
+        self.tableWidgetFilesOD.verticalHeader().setCascadingSectionResizes(False)
+
+        self.verticalLayout_6.addWidget(self.tableWidgetFilesOD)
+
+        self.tabWidgetOD.addTab(self.tabDataset, "")
+        self.tabTrain = QWidget()
+        self.tabTrain.setObjectName(u"tabTrain")
+        self.tabWidgetOD.addTab(self.tabTrain, "")
+
+        self.verticalLayout_2.addWidget(self.tabWidgetOD)
+
         self.stackedWidgetProject.addWidget(self.page_OD)
         self.page_IC = QWidget()
         self.page_IC.setObjectName(u"page_IC")
@@ -139,12 +200,12 @@ class Ui_FormProjectManager(object):
         self.tableWidgetFilesIC = QTableWidget(self.tab)
         if (self.tableWidgetFilesIC.columnCount() < 3):
             self.tableWidgetFilesIC.setColumnCount(3)
-        __qtablewidgetitem = QTableWidgetItem()
-        self.tableWidgetFilesIC.setHorizontalHeaderItem(0, __qtablewidgetitem)
-        __qtablewidgetitem1 = QTableWidgetItem()
-        self.tableWidgetFilesIC.setHorizontalHeaderItem(1, __qtablewidgetitem1)
-        __qtablewidgetitem2 = QTableWidgetItem()
-        self.tableWidgetFilesIC.setHorizontalHeaderItem(2, __qtablewidgetitem2)
+        __qtablewidgetitem3 = QTableWidgetItem()
+        self.tableWidgetFilesIC.setHorizontalHeaderItem(0, __qtablewidgetitem3)
+        __qtablewidgetitem4 = QTableWidgetItem()
+        self.tableWidgetFilesIC.setHorizontalHeaderItem(1, __qtablewidgetitem4)
+        __qtablewidgetitem5 = QTableWidgetItem()
+        self.tableWidgetFilesIC.setHorizontalHeaderItem(2, __qtablewidgetitem5)
         self.tableWidgetFilesIC.setObjectName(u"tableWidgetFilesIC")
         self.tableWidgetFilesIC.verticalHeader().setCascadingSectionResizes(False)
 
@@ -394,8 +455,9 @@ class Ui_FormProjectManager(object):
 
         self.retranslateUi(FormProjectManager)
 
-        self.stackedWidgetProject.setCurrentIndex(2)
-        self.tabWidgetIC.setCurrentIndex(2)
+        self.stackedWidgetProject.setCurrentIndex(1)
+        self.tabWidgetOD.setCurrentIndex(0)
+        self.tabWidgetIC.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(FormProjectManager)
@@ -408,18 +470,31 @@ class Ui_FormProjectManager(object):
         self.label.setText(QCoreApplication.translate("FormProjectManager", u"Current project =", None))
         self.labelCurrentProject.setText(QCoreApplication.translate("FormProjectManager", u"...", None))
         self.label_2.setText(QCoreApplication.translate("FormProjectManager", u"Object Detection", None))
+        self.label_15.setText(QCoreApplication.translate("FormProjectManager", u"Files ", None))
+        self.pushButtonTakeShotsOD.setText(QCoreApplication.translate("FormProjectManager", u"Take shots", None))
+        self.pushButtonImpotrOD.setText(QCoreApplication.translate("FormProjectManager", u"Import", None))
+        self.pushButtonAnnotateOD.setText(QCoreApplication.translate("FormProjectManager", u"Annotate", None))
+        self.pushButtonMakeDatasetOD.setText(QCoreApplication.translate("FormProjectManager", u"Make", None))
+        ___qtablewidgetitem = self.tableWidgetFilesOD.horizontalHeaderItem(0)
+        ___qtablewidgetitem.setText(QCoreApplication.translate("FormProjectManager", u"#", None));
+        ___qtablewidgetitem1 = self.tableWidgetFilesOD.horizontalHeaderItem(1)
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("FormProjectManager", u"Name", None));
+        ___qtablewidgetitem2 = self.tableWidgetFilesOD.horizontalHeaderItem(2)
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("FormProjectManager", u"Class", None));
+        self.tabWidgetOD.setTabText(self.tabWidgetOD.indexOf(self.tabDataset), QCoreApplication.translate("FormProjectManager", u"Dataset", None))
+        self.tabWidgetOD.setTabText(self.tabWidgetOD.indexOf(self.tabTrain), QCoreApplication.translate("FormProjectManager", u"Train", None))
         self.label_3.setText(QCoreApplication.translate("FormProjectManager", u"Image Classification", None))
         self.label_4.setText(QCoreApplication.translate("FormProjectManager", u"Files ", None))
         self.pushButtonTakeShots.setText(QCoreApplication.translate("FormProjectManager", u"Take shots", None))
         self.pushButton_2.setText(QCoreApplication.translate("FormProjectManager", u"Import", None))
         self.pushButtonAnnotate.setText(QCoreApplication.translate("FormProjectManager", u"Annotate", None))
         self.pushButtonMakeDataset.setText(QCoreApplication.translate("FormProjectManager", u"Make", None))
-        ___qtablewidgetitem = self.tableWidgetFilesIC.horizontalHeaderItem(0)
-        ___qtablewidgetitem.setText(QCoreApplication.translate("FormProjectManager", u"#", None));
-        ___qtablewidgetitem1 = self.tableWidgetFilesIC.horizontalHeaderItem(1)
-        ___qtablewidgetitem1.setText(QCoreApplication.translate("FormProjectManager", u"Name", None));
-        ___qtablewidgetitem2 = self.tableWidgetFilesIC.horizontalHeaderItem(2)
-        ___qtablewidgetitem2.setText(QCoreApplication.translate("FormProjectManager", u"Class", None));
+        ___qtablewidgetitem3 = self.tableWidgetFilesIC.horizontalHeaderItem(0)
+        ___qtablewidgetitem3.setText(QCoreApplication.translate("FormProjectManager", u"#", None));
+        ___qtablewidgetitem4 = self.tableWidgetFilesIC.horizontalHeaderItem(1)
+        ___qtablewidgetitem4.setText(QCoreApplication.translate("FormProjectManager", u"Name", None));
+        ___qtablewidgetitem5 = self.tableWidgetFilesIC.horizontalHeaderItem(2)
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("FormProjectManager", u"Class", None));
         self.pushButtonDeleteFiles.setText(QCoreApplication.translate("FormProjectManager", u"Delete", None))
         self.tabWidgetIC.setTabText(self.tabWidgetIC.indexOf(self.tab), QCoreApplication.translate("FormProjectManager", u"Dataset", None))
         self.label_5.setText(QCoreApplication.translate("FormProjectManager", u"Dataset", None))
