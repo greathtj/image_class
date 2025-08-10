@@ -89,6 +89,7 @@ class projectManagerWidget(QWidget):
                 my_video=self.my_video,
                 parent=self
             )
+            self.object_detector.update_file_list()
         elif project_type == "Image Classification":
             self.ui.stackedWidgetProject.setCurrentIndex(2)
             self.image_classifier = image_classifier(

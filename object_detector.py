@@ -1,3 +1,10 @@
+import os
+import time
+import datetime
+
+from PySide6.QtWidgets import QWidget, QFileDialog, QTableWidgetItem, QTableWidget, QMessageBox
+from PySide6.QtCore import QThread, Signal, QTimer
+
 from widgets.project_manager_ui import Ui_FormProjectManager
 from widgets.annotation_manager import AnnotationWidget
 from widgets.annotate_dialog import AnnotateDialog
@@ -18,3 +25,65 @@ class object_detector():
         self.my_annotator = my_annotator
         self.my_video = my_video
         self.my_parent = parent
+
+        self.capture_timer = QTimer(self.my_parent)
+        self.capture_timer.setInterval(200)  # 0.2 seconds
+        self.capture_timer.timeout.connect(self.take_shot)
+
+        self.ui = parentui
+        self.ui.pushButtonTakeShotsOD.pressed.connect(self.start_taking_shots)
+        self.ui.pushButtonTakeShotsOD.released.connect(self.stop_taking_shots)
+        self.ui.pushButtonTakeShotsOD.clicked.connect(self.take_shot)
+
+        self.ui.pushButtonAnnotateOD.clicked.connect(self.start_annotation)
+
+    def start_annotation(self):
+        my_annotate_dialog = AnnotateDialog(
+            project_data=self.project_data,
+            parent=self.my_parent
+        )
+        my_annotate_dialog.exec()
+
+    def start_taking_shots(self):
+        self.capture_timer.start()
+
+    def stop_taking_shots(self):
+        self.capture_timer.stop()
+
+    def take_shot(self):
+        if self.project_data and self.my_annotator:
+            data_dir = f"{self.project_data.get('directory')}/data"
+            try:
+                os.makedirs(data_dir, exist_ok=True)
+                print(f"Folder '{data_dir}' ensured to exist.")
+            except OSError as e:
+                print(f"Error creating folder '{data_dir}': {e}")
+
+            if data_dir and os.path.exists(data_dir):
+                pixmap = self.my_annotator.current_pixmap
+                # timestamp = int(time.time() * 1000)
+                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+                file_path = os.path.join(data_dir, f"shot_{timestamp}.jpg")
+                pixmap.save(file_path, "JPG")
+                print(f"Image saved to {file_path}")
+                self.update_file_list()
+
+    def update_file_list(self):
+        if self.project_data:
+            data_dir = f"{self.project_data.get('directory')}/data"
+            try:
+                os.makedirs(data_dir, exist_ok=True)
+                print(f"Folder '{data_dir}' ensured to exist.")
+            except OSError as e:
+                print(f"Error creating folder '{data_dir}': {e}")
+
+            if data_dir and os.path.exists(data_dir):
+                files = sorted([f for f in os.listdir(data_dir) if f.endswith(('.png', '.jpg', '.jpeg'))])
+                self.ui.tableWidgetFilesOD.setRowCount(len(files))
+                self.ui.tableWidgetFilesOD.setColumnCount(2)
+                self.ui.tableWidgetFilesOD.setHorizontalHeaderLabels(["File Name", "Class"])
+                self.ui.tableWidgetFilesOD.setColumnWidth(0, 250)
+                self.ui.tableWidgetFilesOD.setColumnWidth(1, 60)
+                for row, file_name in enumerate(files):
+                    self.ui.tableWidgetFilesOD.setItem(row, 0, QTableWidgetItem(file_name))
+                    self.ui.tableWidgetFilesOD.setItem(row, 1, QTableWidgetItem(""))
