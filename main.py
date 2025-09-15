@@ -43,7 +43,7 @@ class MainWindow(QMainWindow):
             camera_index=self.camera_index,
             width=self.frame_width,
             height=self.frame_height,
-            parent=self
+            parent=self 
         )
         self.my_video.is_detecting = False
         self.my_video.frame_ready.connect(self.my_annotator.update_image)
@@ -65,7 +65,7 @@ class MainWindow(QMainWindow):
         )
         # self.my_annotator.annotation_added.connect(self.handle_annotation_added)
         self.ui.verticalLayoutImage.addWidget(self.my_annotator)
-        self.my_annotator.set_drawing_mode(AnnotationWidget.DRAW_CENTER_SQUARE) # default no drawing
+        self.my_annotator.set_drawing_mode(AnnotationWidget.DRAW_NONE) # default no drawing
 
     def _init_project_manager_widget(self):
         self.my_project_manager = projectManagerWidget(

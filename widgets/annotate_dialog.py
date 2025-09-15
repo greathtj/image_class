@@ -11,6 +11,7 @@ class AnnotateDialog(QDialog):
     def __init__(
             self, 
             project_data:dict,
+            annotation_type=AnnotationWidget.DRAW_CENTER_SQUARE,
             parent=None
         ):
         super().__init__(parent)
@@ -18,6 +19,7 @@ class AnnotateDialog(QDialog):
         self.ui.setupUi(self)
 
         self.project_data = project_data
+        self.annotation_type = annotation_type
 
         self._init_annotation_widget()
         
@@ -348,7 +350,7 @@ class AnnotateDialog(QDialog):
         )
         # self.my_annotator.annotation_added.connect(self.handle_annotation_added)
         self.ui.verticalLayoutImage.addWidget(self.my_annotator)
-        self.my_annotator.set_drawing_mode(AnnotationWidget.DRAW_CENTER_SQUARE) # default no drawing
+        self.my_annotator.set_drawing_mode(self.annotation_type) # default no drawing
 
     def get_value_from_json_file(self, file_path: str, key: str):
         """

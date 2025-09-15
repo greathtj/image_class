@@ -1,6 +1,7 @@
 import os
 import time
 import datetime
+import shutil
 
 from PySide6.QtWidgets import QWidget, QFileDialog, QTableWidgetItem, QTableWidget, QMessageBox
 from PySide6.QtCore import QThread, Signal, QTimer
@@ -35,14 +36,42 @@ class object_detector():
         self.ui.pushButtonTakeShotsOD.released.connect(self.stop_taking_shots)
         self.ui.pushButtonTakeShotsOD.clicked.connect(self.take_shot)
 
+        self.ui.pushButtonImpotrOD.clicked.connect(self.import_images)
+
         self.ui.pushButtonAnnotateOD.clicked.connect(self.start_annotation)
 
     def start_annotation(self):
         my_annotate_dialog = AnnotateDialog(
             project_data=self.project_data,
+            annotation_type=AnnotationWidget.DRAW_RECTANGLE,
             parent=self.my_parent
         )
         my_annotate_dialog.exec()
+
+    def import_images(self):
+        if self.project_data:
+            data_dir = f"{self.project_data.get('directory')}/data"
+            try:
+                os.makedirs(data_dir, exist_ok=True)
+            except OSError as e:
+                print(f"Error creating folder '{data_dir}': {e}")
+                return
+
+            file_paths, _ = QFileDialog.getOpenFileNames(
+                self.my_parent,
+                "Import Images",
+                "",
+                "Images (*.png *.jpg *.jpeg)"
+            )
+
+            if file_paths:
+                for file_path in file_paths:
+                    try:
+                        shutil.copy(file_path, data_dir)
+                    except shutil.Error as e:
+                        print(f"Error copying file: {e}")
+                
+                self.update_file_list()
 
     def start_taking_shots(self):
         self.capture_timer.start()
