@@ -1,16 +1,26 @@
 import os
 import json
+from pathlib import Path
+from enum import Enum
 
 from PySide6.QtWidgets import QDialog, QListWidget, QListWidgetItem
 from PySide6.QtGui import QPixmap, QImage
+from PySide6.QtCore import QRect
 
 from widgets.annotate_dialog_ui import Ui_DialogAnnotate
 from widgets.annotation_manager import AnnotationWidget
+
+class detection(Enum):
+    OBJECT_DETECTION = 0
+    CLASSIFICATION = 1
+    OTHER = 2
+
 
 class AnnotateDialog(QDialog):
     def __init__(
             self, 
             project_data:dict,
+            detection_type = "CL",
             annotation_type=AnnotationWidget.DRAW_CENTER_SQUARE,
             parent=None
         ):
@@ -19,6 +29,7 @@ class AnnotateDialog(QDialog):
         self.ui.setupUi(self)
 
         self.project_data = project_data
+        self.detection_type = detection_type
         self.annotation_type = annotation_type
 
         self._init_annotation_widget()
@@ -32,9 +43,54 @@ class AnnotateDialog(QDialog):
 
         self.ui.pushButtonDeleteAnnotated.clicked.connect(self.delete_annotated)
 
+        self.my_annotator.annotation_added.connect(self.annotation_added)
+
         self.update_file_list()
         self.update_classes()
 
+    def annotation_added(self):
+        print("annotation added.")
+        # get the class name
+        selected_class_item = self.ui.listWidgetClasses.currentItem()
+
+        # Get the name of the file without its extension (the "stem")
+        image_file_name = Path(self.ui.listWidgetFiles.currentItem().text())
+        if image_file_name:
+            image_name = image_file_name.stem
+        else:
+            print("No file is selected.")
+            del self.my_annotator.annotations[-1]
+            return
+
+        # Create the new path for the annotation file
+        annotation_path = f"{self.project_data.get('directory')}/data/{image_name}.txt"
+
+        if selected_class_item:
+            # Assign the class for the last annotation
+            this_class = selected_class_item.text()
+            self.my_annotator.annotations[-1]['class'] = this_class
+            # print(self.my_annotator.annotations)
+
+            # save the annotation as a text file
+            image_size = self.my_annotator.current_pixmap.size()
+            annotation_str = ""
+            print(self.my_annotator.annotations)
+            for annotation in self.my_annotator.annotations:
+                rect:QRect = annotation["rect"]
+                nx = rect.x() / image_size.width()
+                ny = rect.y() / image_size.height()
+                nw = rect.width() / image_size.width()
+                nh = rect.height() / image_size.height()
+                cls = annotation['class']
+                annotation_str += f"{cls} {nx} {ny} {nw} {nh}\n"
+            
+            with open(annotation_path, 'w') as f:
+                f.write(annotation_str.strip())
+
+        else:
+            print("No class is selected.")
+            del self.my_annotator.annotations[-1]
+    
     def clear_all_annotation(self):
         # delete the annotation_info.json file
         data_dir = f"{self.project_data.get('directory')}/data"
@@ -334,15 +390,42 @@ class AnnotateDialog(QDialog):
         self.my_annotator.update_image(pixmap.toImage(), is_still_image=True)
         print(f"이미지 로드됨: {image_filepath}")
 
-        data_dir = f"{self.project_data.get('directory')}/data"
-        annotated_class = self.get_value_from_json_file(
-            f"{data_dir}/annotation_info.json",
-            filename
-        )
-        
-        self.ui.listWidgetAnnotated.clear()
-        if annotated_class:
-            self.ui.listWidgetAnnotated.addItem(annotated_class)
+        if self.detection_type == "CL":
+            data_dir = f"{self.project_data.get('directory')}/data"
+            annotated_class = self.get_value_from_json_file(
+                f"{data_dir}/annotation_info.json",
+                filename
+            )
+            
+            self.ui.listWidgetAnnotated.clear()
+            if annotated_class:
+                self.ui.listWidgetAnnotated.addItem(annotated_class)
+
+        elif self.detection_type == "OD":
+            annotation_path = f"{self.project_data.get('directory')}/data/{Path(image_filepath).stem}.txt"
+            
+            lines = []
+            with open(annotation_path, 'r') as f:
+                lines = f.readlines()
+            print(lines)
+            
+            image_size = self.my_annotator.current_pixmap.size()
+            self.my_annotator.annotations.clear()
+            for line in lines:
+                info = [item.strip() for item in line.split(" ")]
+                self.my_annotator.annotations.append(
+                    {
+                        'type':'rectangle', 
+                        'rect':QRect(
+                            float(info[1])*image_size.width(),
+                            float(info[2])*image_size.height(),
+                            float(info[3])*image_size.width(),
+                            float(info[4])*image_size.height()
+                        ),
+                        'class':info[0]
+                    }
+                )
+                self.my_annotator.update()
 
     def _init_annotation_widget(self):
         self.my_annotator = AnnotationWidget(

@@ -2,6 +2,7 @@ import os
 import time
 import datetime
 import shutil
+from enum import Enum
 
 from PySide6.QtWidgets import QWidget, QFileDialog, QTableWidgetItem, QTableWidget, QMessageBox
 from PySide6.QtCore import QThread, Signal, QTimer
@@ -43,6 +44,7 @@ class object_detector():
     def start_annotation(self):
         my_annotate_dialog = AnnotateDialog(
             project_data=self.project_data,
+            detection_type="OD",
             annotation_type=AnnotationWidget.DRAW_RECTANGLE,
             parent=self.my_parent
         )

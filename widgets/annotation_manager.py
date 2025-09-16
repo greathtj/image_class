@@ -356,13 +356,7 @@ class AnnotationWidget(QLabel):
 
             painter.setPen(pen)
 
-            if annotation['type'] == 'rectangle':
-                painter.drawRect(annotation['rect'])
-            elif annotation['type'] == 'circle':
-                painter.drawEllipse(annotation['center'], annotation['radius'], annotation['radius'])
-            elif annotation['type'] == 'line':
-                painter.drawLine(annotation['start'], annotation['end'])
-            elif annotation['type'] == 'center_square':
+            if annotation['type'] == 'rectangle' or annotation['type'] == 'center_square':
                 painter.drawRect(annotation['rect'])
                 painter.setBrush(QColor(0, 0, 255)) 
                 dot_diameter_scaled = 3.0 * (self.current_pixmap.width() / self._image_draw_rect.width())
@@ -399,6 +393,11 @@ class AnnotationWidget(QLabel):
                     # 텍스트를 사각형 위 중앙에 그립니다.
                     painter.drawText(text_rect_widget_coords, Qt.AlignHCenter | Qt.AlignBottom, annotation_class)
                     painter.restore() # 저장된 painter 상태 복원
+
+            elif annotation['type'] == 'circle':
+                painter.drawEllipse(annotation['center'], annotation['radius'], annotation['radius'])
+            elif annotation['type'] == 'line':
+                painter.drawLine(annotation['start'], annotation['end'])
 
         painter.restore()
 
