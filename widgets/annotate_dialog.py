@@ -32,8 +32,14 @@ class AnnotateDialog(QDialog):
 
         self.ui.pushButtonDeleteAnnotated.clicked.connect(self.delete_annotated)
 
+        self.my_annotator.annotation_added.connect(self.annotation_added)
+
         self.update_file_list()
         self.update_classes()
+
+    def annotation_added(self):
+        print("annotation added.")
+        print(self.my_annotator.annotations)
 
     def clear_all_annotation(self):
         # delete the annotation_info.json file
