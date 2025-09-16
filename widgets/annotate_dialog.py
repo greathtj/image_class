@@ -50,7 +50,6 @@ class AnnotateDialog(QDialog):
 
     def annotation_added(self):
         print("annotation added.")
-<<<<<<< HEAD
         # get the class name
         selected_class_item = self.ui.listWidgetClasses.currentItem()
 
@@ -92,10 +91,6 @@ class AnnotateDialog(QDialog):
             print("No class is selected.")
             del self.my_annotator.annotations[-1]
     
-=======
-        print(self.my_annotator.annotations)
-
->>>>>>> e5da825c2d8369414ecb09333cbb18b1e3f603ee
     def clear_all_annotation(self):
         # delete the annotation_info.json file
         data_dir = f"{self.project_data.get('directory')}/data"
