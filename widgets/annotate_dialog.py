@@ -35,6 +35,7 @@ class AnnotateDialog(QDialog):
         self._init_annotation_widget()
         
         self.ui.listWidgetFiles.currentItemChanged.connect(self.on_current_item_changed)
+        self.ui.listWidgetAnnotated.currentItemChanged.connect(self.on_annotated_selection_changed)
         self.ui.pushButtonAddClass.clicked.connect(self.add_class)
         self.ui.pushButtonDeleteClass.clicked.connect(self.delete_class)
 
@@ -48,80 +49,133 @@ class AnnotateDialog(QDialog):
         self.update_file_list()
         self.update_classes()
 
+    def on_annotated_selection_changed(self):
+        ndx = self.ui.listWidgetAnnotated.currentRow()
+        self.my_annotator.selected_annotation_index = ndx
+        self.my_annotator.update()
+
     def annotation_added(self):
-        print("annotation added.")
-        # get the class name
-        selected_class_item = self.ui.listWidgetClasses.currentItem()
+        if self.detection_type == "OD":
+            print("annotation added.")
+            # get the class name
+            selected_class_item = self.ui.listWidgetClasses.currentItem()
 
-        # Get the name of the file without its extension (the "stem")
-        image_file_name = Path(self.ui.listWidgetFiles.currentItem().text())
-        if image_file_name:
-            image_name = image_file_name.stem
-        else:
-            print("No file is selected.")
-            del self.my_annotator.annotations[-1]
-            return
+            # Get the name of the file without its extension (the "stem")
+            image_file_name = Path(self.ui.listWidgetFiles.currentItem().text())
+            if image_file_name:
+                image_name = image_file_name.stem
+            else:
+                print("No file is selected.")
+                del self.my_annotator.annotations[-1]
+                return
 
-        # Create the new path for the annotation file
-        annotation_path = f"{self.project_data.get('directory')}/data/{image_name}.txt"
+            # Create the new path for the annotation file
+            annotation_path = f"{self.project_data.get('directory')}/data/{image_name}.txt"
 
-        if selected_class_item:
-            # Assign the class for the last annotation
-            this_class = selected_class_item.text()
-            self.my_annotator.annotations[-1]['class'] = this_class
-            # print(self.my_annotator.annotations)
+            if selected_class_item:
+                # Assign the class for the last annotation
+                this_class = selected_class_item.text()
+                self.my_annotator.annotations[-1]['class'] = this_class
+                # print(self.my_annotator.annotations)
 
-            # save the annotation as a text file
-            image_size = self.my_annotator.current_pixmap.size()
-            annotation_str = ""
-            print(self.my_annotator.annotations)
-            for annotation in self.my_annotator.annotations:
-                rect:QRect = annotation["rect"]
-                nx = rect.x() / image_size.width()
-                ny = rect.y() / image_size.height()
-                nw = rect.width() / image_size.width()
-                nh = rect.height() / image_size.height()
-                cls = annotation['class']
-                annotation_str += f"{cls} {nx} {ny} {nw} {nh}\n"
-            
-            with open(annotation_path, 'w') as f:
-                f.write(annotation_str.strip())
+                # save the annotation as a text file
+                image_size = self.my_annotator.current_pixmap.size()
+                annotation_str = ""
+                annotated = []
+                for annotation in self.my_annotator.annotations:
+                    rect:QRect = annotation["rect"]
+                    nx = rect.x() / image_size.width()
+                    ny = rect.y() / image_size.height()
+                    nw = rect.width() / image_size.width()
+                    nh = rect.height() / image_size.height()
+                    cls = annotation['class']
+                    annotated.append(cls)
+                    annotation_str += f"{cls} {nx} {ny} {nw} {nh}\n"
+                
+                with open(annotation_path, 'w') as f:
+                    f.write(annotation_str.strip())
 
-        else:
-            print("No class is selected.")
-            del self.my_annotator.annotations[-1]
+                self.ui.listWidgetAnnotated.clear()
+                self.ui.listWidgetAnnotated.addItems(annotated)
+
+            else:
+                print("No class is selected.")
+                del self.my_annotator.annotations[-1]
     
     def clear_all_annotation(self):
-        # delete the annotation_info.json file
-        data_dir = f"{self.project_data.get('directory')}/data"
-        annotation_info_path = f"{data_dir}/annotation_info.json"
-        if os.path.exists(annotation_info_path):
-            os.remove(annotation_info_path)
-            print(f"File '{annotation_info_path}' deleted.")
+        if self.detection_type == "CL":
+            # delete the annotation_info.json file
+            data_dir = f"{self.project_data.get('directory')}/data"
+            annotation_info_path = f"{data_dir}/annotation_info.json"
+            if os.path.exists(annotation_info_path):
+                os.remove(annotation_info_path)
+                print(f"File '{annotation_info_path}' deleted.")
 
-        # update the file list
-        self.update_file_list()
+            # update the file list
+            self.update_file_list()
 
-        # clear annotated liswidget
-        self.ui.listWidgetAnnotated.clear()
+            # clear annotated liswidget
+            self.ui.listWidgetAnnotated.clear()
 
     def delete_annotated(self):
-        annotation_info_file = f"{self.project_data.get('directory')}/data/annotation_info.json"
-        selected_item = self.ui.listWidgetAnnotated.currentItem()
-        selected_key = self.ui.listWidgetFiles.currentItem().text().split(":-")[0] if self.ui.listWidgetFiles.currentItem() else None
+        if self.detection_type == "CL":
+            annotation_info_file = f"{self.project_data.get('directory')}/data/annotation_info.json"
+            selected_item = self.ui.listWidgetAnnotated.currentItem()
+            selected_key = self.ui.listWidgetFiles.currentItem().text().split(":-")[0] if self.ui.listWidgetFiles.currentItem() else None
+            
+            if selected_key:
+                # delete the item from annotation info
+                self.delete_json_item(annotation_info_file, selected_key)
+
+                if selected_item:
+                    # delete from the listwidget annotated.
+                    self.ui.listWidgetAnnotated.takeItem(self.ui.listWidgetAnnotated.row(selected_item))
+
+                    self.update_selected_item_text(
+                        self.ui.listWidgetFiles.currentItem(), 
+                        self.ui.listWidgetFiles.currentItem().text().split(":-")[0]
+                    )
         
-        if selected_key:
-            # delete the item from annotation info
-            self.delete_json_item(annotation_info_file, selected_key)
+        elif self.detection_type == "OD":
+            if self.ui.listWidgetAnnotated.currentItem():
+                selected_index = self.ui.listWidgetAnnotated.currentRow()
+                print(f"deleting {selected_index+1}th annotation...")
+                self.my_annotator.annotations.pop(selected_index)
 
-            if selected_item:
-                # delete from the listwidget annotated.
-                self.ui.listWidgetAnnotated.takeItem(self.ui.listWidgetAnnotated.row(selected_item))
+                # update annotation file
+                image_size = self.my_annotator.current_pixmap.size()
+                annotation_str = ""
+                annotated_list = []
+                for annotation in self.my_annotator.annotations:
+                    rect:QRect = annotation["rect"]
+                    nx = rect.x() / image_size.width()
+                    ny = rect.y() / image_size.height()
+                    nw = rect.width() / image_size.width()
+                    nh = rect.height() / image_size.height()
+                    cls = annotation['class']
+                    annotated_list.append(cls)
+                    annotation_str += f"{cls} {nx} {ny} {nw} {nh}\n"                
 
-                self.update_selected_item_text(
-                    self.ui.listWidgetFiles.currentItem(), 
-                    self.ui.listWidgetFiles.currentItem().text().split(":-")[0]
-                )
+                # Get the name of the file without its extension (the "stem")
+                image_file_name = Path(self.ui.listWidgetFiles.currentItem().text())
+                if image_file_name:
+                    image_name = image_file_name.stem
+                else:
+                    print("No file is selected.")
+                    del self.my_annotator.annotations[-1]
+                    return
+        
+                # Create the new path for the annotation file
+                annotation_path = f"{self.project_data.get('directory')}/data/{image_name}.txt"
+                
+                with open(annotation_path, 'w') as f:
+                    f.write(annotation_str.strip())
+
+                # update annotated list
+                self.ui.listWidgetAnnotated.clear()
+                self.ui.listWidgetAnnotated.addItems(annotated_list)
+
+                self.my_annotator.update()
 
     def delete_json_item(self, file_path: str, key_to_delete: str) -> bool:
         """
@@ -181,48 +235,49 @@ class AnnotateDialog(QDialog):
             return False
 
     def apply_and_move_next(self):
-        selected_class_item = self.ui.listWidgetClasses.currentItem()
-        if selected_class_item:
-            selected_class = selected_class_item.text()
-        else:
-            return
+        if self.detection_type == "CL":
+            selected_class_item = self.ui.listWidgetClasses.currentItem()
+            if selected_class_item:
+                selected_class = selected_class_item.text()
+            else:
+                return
 
-        if self.project_data:
-            data_dir = f"{self.project_data.get('directory')}/data"
-            try:
-                os.makedirs(data_dir, exist_ok=True)
-                print(f"Folder '{data_dir}' ensured to exist.")
-            except OSError as e:
-                print(f"Error creating folder '{data_dir}': {e}")
-
-        annotate_info = {}
-        if data_dir and os.path.exists(data_dir):
-            annotate_info_file = f"{data_dir}/annotation_info.json"
-            if not os.path.exists(annotate_info_file):
-                # File does not exist, so create it
+            if self.project_data:
+                data_dir = f"{self.project_data.get('directory')}/data"
                 try:
-                    with open(annotate_info_file, 'w', encoding='utf-8') as f:
-                        # Writing nothing, just creating an empty file
-                        pass
-                    print(f"File '{annotate_info_file}' did not exist and was created.")
+                    os.makedirs(data_dir, exist_ok=True)
+                    print(f"Folder '{data_dir}' ensured to exist.")
+                except OSError as e:
+                    print(f"Error creating folder '{data_dir}': {e}")
+
+            annotate_info = {}
+            if data_dir and os.path.exists(data_dir):
+                annotate_info_file = f"{data_dir}/annotation_info.json"
+                if not os.path.exists(annotate_info_file):
+                    # File does not exist, so create it
+                    try:
+                        with open(annotate_info_file, 'w', encoding='utf-8') as f:
+                            # Writing nothing, just creating an empty file
+                            pass
+                        print(f"File '{annotate_info_file}' did not exist and was created.")
+                    except IOError as e:
+                        print(f"Error creating file '{annotate_info_file}': {e}")
+
+                # File exists, so replace the value
+                try:
+                    file_name = self.ui.listWidgetFiles.currentItem().text().split(":-")[0]
+                    self.update_or_add_json_item(annotate_info_file, file_name, selected_class)
+                    print(f"Annotation info is updated for {file_name} with {selected_class}")
+
+                    self.update_selected_item_text(
+                        self.ui.listWidgetFiles.currentItem(), 
+                        f"{file_name}:-{selected_class}"
+                    )
                 except IOError as e:
-                    print(f"Error creating file '{annotate_info_file}': {e}")
+                    print(f"Error reading file '{annotate_info_file}': {e}")
 
-            # File exists, so replace the value
-            try:
-                file_name = self.ui.listWidgetFiles.currentItem().text().split(":-")[0]
-                self.update_or_add_json_item(annotate_info_file, file_name, selected_class)
-                print(f"Annotation info is updated for {file_name} with {selected_class}")
-
-                self.update_selected_item_text(
-                    self.ui.listWidgetFiles.currentItem(), 
-                    f"{file_name}:-{selected_class}"
-                )
-            except IOError as e:
-                print(f"Error reading file '{annotate_info_file}': {e}")
-
-        # move to next item
-        self.select_next_list_item(self.ui.listWidgetFiles)
+            # move to next item
+            self.select_next_list_item(self.ui.listWidgetFiles)
 
     def update_selected_item_text(self, selected_item:QListWidgetItem, new_text:str):
         """
@@ -404,13 +459,22 @@ class AnnotateDialog(QDialog):
         elif self.detection_type == "OD":
             annotation_path = f"{self.project_data.get('directory')}/data/{Path(image_filepath).stem}.txt"
             
+            self.update_od_annotations_from_txt(annotation_path)
+
+    def update_od_annotations_from_txt(self, annotation_path):
+        # Create a Path object for the file
+        my_file = Path(annotation_path)
+        self.ui.listWidgetAnnotated.clear()
+
+        # Check if the file exists
+        if my_file.exists():
             lines = []
             with open(annotation_path, 'r') as f:
                 lines = f.readlines()
-            print(lines)
-            
+
             image_size = self.my_annotator.current_pixmap.size()
             self.my_annotator.annotations.clear()
+            annotated_list = []
             for line in lines:
                 info = [item.strip() for item in line.split(" ")]
                 self.my_annotator.annotations.append(
@@ -425,7 +489,16 @@ class AnnotateDialog(QDialog):
                         'class':info[0]
                     }
                 )
+                annotated_list.append(info[0])
                 self.my_annotator.update()
+
+            # update annotated list
+            self.ui.listWidgetAnnotated.addItems(annotated_list)
+
+        else:
+            print("No annotation file, yet.")
+            self.my_annotator.annotations.clear()
+            self.my_annotator.update()
 
     def _init_annotation_widget(self):
         self.my_annotator = AnnotationWidget(

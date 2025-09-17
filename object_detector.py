@@ -12,6 +12,8 @@ from widgets.annotation_manager import AnnotationWidget
 from widgets.annotate_dialog import AnnotateDialog
 from widgets.video_stream_manager import VideoStreamer
 
+from widgets.make_dataset_dialog import make_dataset_dialog
+
 class object_detector():
     
     def __init__(
@@ -40,6 +42,12 @@ class object_detector():
         self.ui.pushButtonImpotrOD.clicked.connect(self.import_images)
 
         self.ui.pushButtonAnnotateOD.clicked.connect(self.start_annotation)
+        self.ui.pushButtonMakeDatasetOD.clicked.connect(self.make_object_detection_dataset)
+
+    def make_object_detection_dataset(self):
+        dataset_dialog = make_dataset_dialog(project_data=self.project_data,
+                                             parent=self.my_parent)
+        dataset_dialog.exec()        
 
     def start_annotation(self):
         my_annotate_dialog = AnnotateDialog(

@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'project_manager.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.7.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -365,7 +365,7 @@ class Ui_FormProjectManager(object):
         sizePolicy.setHeightForWidth(self.label_10.sizePolicy().hasHeightForWidth())
         self.label_10.setSizePolicy(sizePolicy)
 
-        self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.label_10)
+        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.label_10)
 
         self.horizontalLayout_7 = QHBoxLayout()
         self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
@@ -382,14 +382,14 @@ class Ui_FormProjectManager(object):
         self.horizontalLayout_7.addWidget(self.pushButtonRefreshTrainedModels)
 
 
-        self.formLayout.setLayout(0, QFormLayout.ItemRole.FieldRole, self.horizontalLayout_7)
+        self.formLayout.setLayout(0, QFormLayout.FieldRole, self.horizontalLayout_7)
 
         self.label_11 = QLabel(self.tab_3)
         self.label_11.setObjectName(u"label_11")
         sizePolicy.setHeightForWidth(self.label_11.sizePolicy().hasHeightForWidth())
         self.label_11.setSizePolicy(sizePolicy)
 
-        self.formLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.label_11)
+        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.label_11)
 
         self.comboBoxConfidence = QComboBox(self.tab_3)
         self.comboBoxConfidence.addItem("")
@@ -400,14 +400,14 @@ class Ui_FormProjectManager(object):
         self.comboBoxConfidence.addItem("")
         self.comboBoxConfidence.setObjectName(u"comboBoxConfidence")
 
-        self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.comboBoxConfidence)
+        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.comboBoxConfidence)
 
         self.label_12 = QLabel(self.tab_3)
         self.label_12.setObjectName(u"label_12")
         sizePolicy.setHeightForWidth(self.label_12.sizePolicy().hasHeightForWidth())
         self.label_12.setSizePolicy(sizePolicy)
 
-        self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.label_12)
+        self.formLayout.setWidget(2, QFormLayout.LabelRole, self.label_12)
 
         self.comboBoxInferenceImageSize = QComboBox(self.tab_3)
         self.comboBoxInferenceImageSize.addItem("")
@@ -418,7 +418,7 @@ class Ui_FormProjectManager(object):
         self.comboBoxInferenceImageSize.addItem("")
         self.comboBoxInferenceImageSize.setObjectName(u"comboBoxInferenceImageSize")
 
-        self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.comboBoxInferenceImageSize)
+        self.formLayout.setWidget(2, QFormLayout.FieldRole, self.comboBoxInferenceImageSize)
 
 
         self.verticalLayout_7.addLayout(self.formLayout)
